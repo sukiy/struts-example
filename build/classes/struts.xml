@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+	"http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+	
+	<!-- 设置系统参数 -->
+	<constant name="struts.devMode" value="true"/>
+	<constant name="struts.action.extension" value="action,do,,"/>
+	<!-- 设置struts UI主题风格 -->
+	<constant name="struts.ui.theme" value="simple"/>
+	
+	<!-- 设置Action -->
+	<package name="com" extends="json-default">
+		<!-- 配置拦截器 -->
+		<interceptors>
+			<interceptor name="loginInterceptor" class="com.struts.interceptor.LoginInterceptor"/>
+			<interceptor-stack name="myLoginStack">
+				<interceptor-ref name="loginInterceptor">
+					<param name="excludeMethods">doLogin,doRegister</param>
+				</interceptor-ref>
+				<interceptor-ref name="defaultStack"/>
+			</interceptor-stack>
+		</interceptors>
+		<!-- 配置全局异常处理 -->
+		<global-results>
+			<result name="login">/index.jsp</result>
+			<result name="notfound">/fileNotFound.jsp</result>
+			<result name="error">/error.jsp</result>
+		</global-results>
+		<global-allowed-methods>regex:.*</global-allowed-methods>
+		<global-exception-mappings>
+			<exception-mapping result="notfound" exception="java.lang.NullPointerException"/>
+		</global-exception-mappings>
+		
+		<!-- 用户的Action -->
+		<action name="userAction_*" method="{1}" class="com.struts.web.UserAction">
+			<result name="input">/index.jsp</result>
+			<result name="main" type="redirectAction">stuAction_findStuList</result>
+			<interceptor-ref name="myLoginStack"/>
+		</action>
+		
+		<!-- 学生的Action -->
+		<action name="stuAction_*" method="{1}" class="com.struts.web.StuAction">
+			<result name="main">/main.jsp</result>
+			<result name="addStu">/addStu.jsp</result>
+			<result name="toAddStu" type="redirectAction">stuAction_toAddStu?message=${message}</result>
+			<result name="updateStu">/updateStu.jsp</result>
+			<result name="tomain" type="redirectAction">stuAction_findStuList?message=${message}</result>
+			<interceptor-ref name="myLoginStack"/>
+		</action>
+	</package>
+</struts>
+
+
+
+
+
